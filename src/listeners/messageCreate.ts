@@ -25,7 +25,7 @@ let handler: EventHandler = {
         });
       }
 
-      if (message.content.match(/[\s]*<:wei:1006227804070883358>[\s]*/)) {
+      if (message.content.match(/^[\s]*<:wei:1006227804070883358>[\s]*$/)) {
         message.channel.send({
           files: ["https://c.tenor.com/kFQDJcTksN8AAAAC/%E6%9D%B0%E5%93%A5.gif"]
         });

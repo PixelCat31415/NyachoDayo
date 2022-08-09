@@ -28,13 +28,15 @@ let cmd: BotCommand = {
   exec: (bot: Bot, cmd: Message, args: string[]): void => {
     const channel = cmd.channel;
     if (cmd.mentions.members) {
+      let msg = "";
       cmd.mentions.members.each(user => {
         let cnt: number | undefined = orz_count.get(user.id);
         if (cnt == undefined) cnt = 1;
         else cnt++;
         orz_count.set(user.id, cnt);
-        channel.send(`\`${user.displayName}\` 好強！已經發電 ${cnt} 次了！`);
+        msg += `\`${user.displayName}\` 好強！已經發電 ${cnt} 次了！\n`;
       });
+      cmd.channel.send(msg);
       SaveOrzCount();
     }
   }
