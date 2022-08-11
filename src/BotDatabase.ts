@@ -1,31 +1,46 @@
-const Database = require("@replit/database");
+import fs from "fs";
+
+import { data_path } from "./config.json";
 
 class BotDatabase {
-  private static instance_: BotDatabase | undefined = undefined;
-  public static getInstance(): BotDatabase {
-    if (!this.instance_)
-      this.instance_ = new BotDatabase();
-    return this.instance_;
-  }
+    private static instance_: BotDatabase | undefined = undefined;
+    public static getInstance(): BotDatabase {
+        if (!this.instance_) this.instance_ = new BotDatabase();
+        return this.instance_;
+    }
 
-  private db: any;
+    private db: any;
 
-  private constructor() {
-    this.db = new Database();
-  }
+    private constructor() {
+        if (fs.existsSync(data_path)) {
+            let raw_json: string = fs.readFileSync(data_path).toString();
+            this.db = JSON.parse(raw_json);
+        } else {
+            this.db = {};
+        }
+    }
 
-  public async GetValue(key: string) {
-    return await this.db.get(key);
-  }
-  public async SetValue(key: string, value: any) {
-    return await this.db.set(key, value);
-  }
-  public async RemoveValue(key: string) {
-    return await this.db.delete(key);
-  }
-  public async ListKeys(pre: string = "") {
-    return await this.db.list(pre);
-  }
+    public GetValue(key: string): any {
+        if (this.Count(key)) {
+            return this.db[key];
+        } else {
+            return undefined;
+        }
+    }
+    public SetValue(key: string, value: any) {
+        this.db[key] = value;
+    }
+    public RemoveValue(key: string) {
+        if (this.Count(key)) {
+            delete this.db[key];
+        }
+    }
+    public Count(key: string) {
+        return this.db.hasOwnProperty(key);
+    }
+    public Save() {
+        fs.writeFileSync(data_path, JSON.stringify(this.db));
+    }
 }
 
 export default BotDatabase;
