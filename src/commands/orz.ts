@@ -1,6 +1,5 @@
-import { Message, Snowflake } from "discord.js";
+import { Message, Snowflake, EmbedBuilder } from "discord.js";
 import { BotCommand } from "../Typings";
-import { botId } from "../config.json"
 import Bot from "../Bot";
 import BotDatabase from "../BotDatabase";
 
@@ -20,35 +19,65 @@ function SaveOrzCount() {
     db.Save();
 }
 
+function DoOrz(msg: Message) {
+    if (msg.mentions.members) {
+        let reply_msg = "";
+        msg.mentions.members.each((user) => {
+            let cnt: number | undefined = orzed_count.get(user.id);
+            if (cnt == undefined) cnt = 0;
+            cnt++;
+            orzed_count.set(user.id, cnt);
+            reply_msg += `${user.toString()} 好強！已經發電 ${cnt} 次了！\n`;
+        });
+        if (reply_msg.length > 0) {
+            msg.channel.send({
+                content: reply_msg,
+                allowedMentions: { users: [] },
+            });
+        } else {
+            msg.channel.send("<:asleep:940860160736391228>");
+        }
+
+        let cnt: number | undefined = orzing_count.get(msg.author.id);
+        if (cnt == undefined) cnt = 0;
+        cnt += msg.mentions.members.size;
+        orzing_count.set(msg.author.id, cnt);
+
+        SaveOrzCount();
+    }
+}
+
+function ListOrzRank(msg: Message) {
+    let embed = new EmbedBuilder().setTitle("n?orz 排行榜").setColor(0x1f1e33);
+    Array.from(orzed_count.entries())
+        .sort((a, b) => {
+            if (a[1] > b[1]) return -1;
+            if (a[1] < b[1]) return 1;
+            return 0;
+        })
+        .forEach((it, i) => {
+            let [id, cnt] = it;
+            embed.addFields({
+                name: `#${i}`,
+                value: `<@${id}> - orzed ${cnt} times`,
+            });
+        });
+    embed.setTimestamp().setFooter({ text: "NyachoDayo bot" });
+    msg.channel.send({
+        embeds: [embed],
+        allowedMentions: { users: [] },
+    });
+}
+
 let cmd: BotCommand = {
     name: "orz",
     command: "orz",
     description: "orz a person",
     exec: (bot: Bot, cmd: Message, args: string[]): void => {
-        if (cmd.mentions.members) {
-            let msg = "";
-            cmd.mentions.members.each((user) => {
-                let cnt: number | undefined = orzed_count.get(user.id);
-                if (cnt == undefined) cnt = 0;
-                cnt++;
-                orzed_count.set(user.id, cnt);
-                msg += `${user.toString()} 好強！已經發電 ${cnt} 次了！\n`;
-            });
-            if (msg.length > 0) {
-                cmd.channel.send({
-                    content: msg,
-                    allowedMentions: { users: [] },
-                });
-            } else {
-                cmd.channel.send("<:asleep:940860160736391228>");
-            }
-
-            let cnt: number | undefined = orzing_count.get(cmd.author.id);
-            if(cnt == undefined) cnt = 0;
-            cnt += cmd.mentions.members.size;
-            orzing_count.set(cmd.author.id, cnt);
-
-            SaveOrzCount();
+        if (args[0] == "rank") {
+            ListOrzRank(cmd);
+        } else {
+            DoOrz(cmd);
         }
     },
 };

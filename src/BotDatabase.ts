@@ -29,7 +29,7 @@ class BotDatabase {
     }
     public GetValueMap(key: string): Map<any, any> {
         let res = new Map();
-        let data = this.GetValue("orz_count");
+        let data = this.GetValue(key);
         if (data) {
             for (let it of data) {
                 res.set(it[0], it[1]);
