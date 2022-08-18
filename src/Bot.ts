@@ -1,19 +1,44 @@
-import { Client, Message } from "discord.js";
+import { Client, Message, GatewayIntentBits } from "discord.js";
 
 import fs from "fs";
 import path from "path";
 
 import { EventHandler, BotCommand, SpecialReplies } from "./Typings";
-import { botId } from "./config.json";
+
+// literally copied all possible intents
+const bot_intents = [
+    GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.DirectMessageTyping,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildBans,
+    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildIntegrations,
+    GatewayIntentBits.GuildInvites,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMessageTyping,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildWebhooks,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+];
 
 class Bot {
     client: Client;
     commands: Map<string, BotCommand>;
     replies: SpecialReplies[];
 
-    constructor(client: Client) {
+    constructor() {
         console.log("Initializing bot");
-        this.client = client;
+
+        this.client = new Client({
+            intents: bot_intents,
+            presence: { status: "idle" },
+        });
+
         this.commands = new Map();
         this.replies = [];
 
@@ -31,11 +56,10 @@ class Bot {
                 listeners_path,
                 file
             ));
-            handler.init(this.client, this);
+            handler.init(this);
             console.log(`Added event listener: ${handler.name}`);
         }
     }
-
     LoadCommands(): void {
         // init commands
         this.commands.clear();
@@ -43,11 +67,10 @@ class Bot {
         const commands_files = fs.readdirSync(commands_path);
         for (let file of commands_files) {
             const command: BotCommand = require(path.join(commands_path, file));
-            this.commands.set(command.name, command);
+            this.commands.set(command.command, command);
             console.log(`Added command: ${command.name}`);
         }
     }
-
     loadSpecialReplies(): void {
         const replies_path = path.join(__dirname, "replies");
         const replies_files = fs.readdirSync(replies_path);
@@ -104,6 +127,17 @@ class Bot {
                 return;
             }
         }
+    }
+
+    // login & start the bot
+    start(token: string): void {
+        console.log("Bot starting");
+        this.client.login(token);
+    }
+    // do bot destructing
+    quit(): void {
+        this.client.destroy();
+        console.log("Bot terminated");
     }
 }
 

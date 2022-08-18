@@ -156,7 +156,7 @@ let cmd: BotCommand = {
     name: "orz",
     command: "orz",
     description: "orz a person",
-    exec: (bot: Bot, cmd: Message, args: string[]): void => {
+    exec: async (bot: Bot, cmd: Message, args: string[]): Promise<void> => {
         if (args[0] == "rank") {
             ListOrzRank(bot, cmd, args);
         } else {

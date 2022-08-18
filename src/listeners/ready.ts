@@ -1,11 +1,10 @@
 import { EventHandler } from "src/Typings";
-
-import { Client } from "discord.js";
 import Bot from "../Bot";
 
 let handler: EventHandler = {
     name: "ready",
-    init: (client: Client, bot: Bot): void => {
+    init: (bot: Bot): void => {
+        const client = bot.client;
         client.on("ready", async () => {
             if (!client.user || !client.application) {
                 return;

@@ -7,7 +7,7 @@ let cmd: BotCommand = {
     name: "ping",
     command: "ping",
     description: "see if NyachoDayo is still alive",
-    exec: (bot: Bot, cmd: Message, args: string[]): void => {
+    exec: async (bot: Bot, cmd: Message, args: string[]): Promise<void> => {
         cmd.reply("pong!");
     },
 };

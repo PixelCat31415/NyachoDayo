@@ -3,13 +3,12 @@ import Bot from "src/Bot";
 import { BotCommand } from "src/Typings";
 
 let cmd: BotCommand = {
-    name: "help",
-    command: "help",
+    name: "quit",
+    command: "quit",
     description: "list bot commands",
     exec: async (bot: Bot, cmd: Message, args: string[]): Promise<void> => {
-        cmd.reply(
-            `Commands available: ${Array.from(bot.commands.keys()).join(", ")}`
-        );
+        await cmd.reply("<:ringo:900994210054946816> <:oyasumi:940859903017357332>");
+        process.kill(process.pid, 'SIGTERM');
     },
 };
 

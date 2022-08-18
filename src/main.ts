@@ -1,39 +1,33 @@
+console.log("Process starting");
+
 // create front end for keeping bot alive
 import http from "http";
-http.createServer((req, res) => res.end("Bot is alive!")).listen(3000);
+const server = http.createServer((req, res) => res.end("Bot is alive!"));
+server.listen(3000);
 
-// NyachoDayo bot
-// literally copied all intents
-import { Client, GatewayIntentBits } from "discord.js";
+// create bot
+import Bot from "./Bot";
+let bot = new Bot();
 
-console.log("Bot is starting...");
-const client = new Client({
-    intents: [
-        GatewayIntentBits.DirectMessageReactions,
-        GatewayIntentBits.DirectMessageTyping,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.GuildBans,
-        GatewayIntentBits.GuildEmojisAndStickers,
-        GatewayIntentBits.GuildIntegrations,
-        GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildMessageTyping,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildScheduledEvents,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildWebhooks,
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.MessageContent,
-    ],
-    presence: { status: "online" },
+// start bot as NyachoDayo
+import { TOKEN } from "./config.json";
+bot.start(TOKEN);
+
+// listen to & destruct on process terminating
+process.on("SIGTERM", () => {
+    bot.quit();
+    server.close(() => {
+        console.log("Process terminated");
+        process.exit(0);
+    });
 });
 
-// create bot functionality
-import Bot from "./Bot";
-let bot = new Bot(client);
-
-// login as NyachoDayo
-import { TOKEN } from "./config.json";
-client.login(TOKEN);
+// listen to & terminate on CLI interrupt
+const readline = require("readline");
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
+process.stdin.on("keypress", (str, key) => {
+    if (key.ctrl && key.name === "c") {
+        process.kill(process.pid, "SIGTERM");
+    }
+});
