@@ -92,7 +92,9 @@ class Bot {
                 message.reply("command not found :broken_heart:");
             }
         } else {
-            message.reply("<:what:940859969710989312>");
+            const emoji = this.client.emojis.cache.get("940859969710989312");
+            if (emoji) message.reply(emoji.toString());
+            else message.reply(":question:");
         }
     }
 
