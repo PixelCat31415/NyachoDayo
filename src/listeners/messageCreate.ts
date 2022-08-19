@@ -2,7 +2,7 @@ import { EventHandler } from "src/Typings";
 
 import { Message } from "discord.js";
 import Bot from "../Bot";
-import { botId } from "../config.json";
+import { botId } from "../data/config.json";
 
 let handler: EventHandler = {
     name: "messageCreate",

@@ -10,7 +10,7 @@ import Bot from "./Bot";
 let bot = new Bot();
 
 // start bot as NyachoDayo
-import { TOKEN } from "./config.json";
+import { TOKEN } from "./data/config.json";
 bot.start(TOKEN);
 
 // listen to & destruct on process terminating

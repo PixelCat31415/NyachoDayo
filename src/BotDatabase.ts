@@ -1,6 +1,7 @@
 import fs from "fs";
+import path from "path";
 
-import { data_path } from "./config.json";
+import { data_path } from "./data/config.json";
 
 class BotDatabase {
     private static instance_: BotDatabase | undefined = undefined;
@@ -12,8 +13,9 @@ class BotDatabase {
     private db: any;
 
     private constructor() {
-        if (fs.existsSync(data_path)) {
-            let raw_json: string = fs.readFileSync(data_path).toString();
+        const abs_path = path.join(__dirname, data_path);
+        if (fs.existsSync(abs_path)) {
+            let raw_json: string = fs.readFileSync(abs_path).toString();
             this.db = JSON.parse(raw_json);
         } else {
             this.db = {};
