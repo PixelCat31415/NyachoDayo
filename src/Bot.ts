@@ -67,8 +67,10 @@ class Bot {
         const commands_files = fs.readdirSync(commands_path);
         for (let file of commands_files) {
             const command: BotCommand = require(path.join(commands_path, file));
-            this.commands.set(command.command, command);
-            console.log(`Added command: ${command.name}`);
+            if(command.enabled) {
+                this.commands.set(command.command, command);
+                console.log(`Added command: ${command.name}`);
+            }
         }
     }
     loadSpecialReplies(): void {

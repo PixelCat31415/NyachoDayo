@@ -15,6 +15,8 @@ export type BotCommand = {
     command: string;
     // brief discription
     description: string;
+    // won't be executed if not enabled
+    enabled: boolean;
     // execute command
     exec(bot: Bot, cmd: Message, args: string[]): Promise<void>;
 };
