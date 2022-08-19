@@ -3,6 +3,8 @@ import path from "path";
 
 import { data_path } from "./data/config.json";
 
+const abs_data_path = path.join(__dirname, data_path);
+
 class BotDatabase {
     private static instance_: BotDatabase | undefined = undefined;
     public static getInstance(): BotDatabase {
@@ -13,9 +15,8 @@ class BotDatabase {
     private db: any;
 
     private constructor() {
-        const abs_path = path.join(__dirname, data_path);
-        if (fs.existsSync(abs_path)) {
-            let raw_json: string = fs.readFileSync(abs_path).toString();
+        if (fs.existsSync(abs_data_path)) {
+            let raw_json: string = fs.readFileSync(abs_data_path).toString();
             this.db = JSON.parse(raw_json);
         } else {
             this.db = {};
@@ -51,7 +52,7 @@ class BotDatabase {
         return this.db.hasOwnProperty(key);
     }
     public Save() {
-        fs.writeFileSync(data_path, JSON.stringify(this.db));
+        fs.writeFileSync(abs_data_path, JSON.stringify(this.db));
     }
 }
 
