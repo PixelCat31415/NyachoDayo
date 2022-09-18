@@ -1,59 +1,35 @@
 import fs from "fs";
 import path from "path";
 
+import sqlite3 from "sqlite3";
+import { open, Database } from "sqlite";
+
 import { data_path } from "./data/config.json";
 
 const abs_data_path = path.join(__dirname, data_path);
 
 class BotDatabase {
-    private static instance_: BotDatabase | undefined = undefined;
-    public static getInstance(): BotDatabase {
-        if (!this.instance_) this.instance_ = new BotDatabase();
-        return this.instance_;
-    }
+    private db: Database<sqlite3.Database, sqlite3.Statement> | undefined;
 
-    private db: any;
-
-    private constructor() {
-        if (fs.existsSync(abs_data_path)) {
-            let raw_json: string = fs.readFileSync(abs_data_path).toString();
-            this.db = JSON.parse(raw_json);
-        } else {
-            this.db = {};
+    public getDB(): Database<sqlite3.Database, sqlite3.Statement> {
+        if (this.db) return this.db;
+        throw Error("database not exist: db is not opened");
+    }
+    public async open() {
+        this.db = await open({
+            filename: ":memory:",
+            driver: sqlite3.Database,
+        });
+        console.log("Database opened");
+    }
+    public async close() {
+        if (this.db != undefined) {
+            await this.db.close();
         }
-    }
-
-    public GetValue(key: string): any {
-        if (this.Count(key)) {
-            return this.db[key];
-        } else {
-            return undefined;
-        }
-    }
-    public GetValueMap(key: string): Map<any, any> {
-        let res = new Map();
-        let data = this.GetValue(key);
-        if (data) {
-            for (let it of data) {
-                res.set(it[0], it[1]);
-            }
-        }
-        return res;
-    }
-    public SetValue(key: string, value: any) {
-        this.db[key] = value;
-    }
-    public RemoveValue(key: string) {
-        if (this.Count(key)) {
-            delete this.db[key];
-        }
-    }
-    public Count(key: string) {
-        return this.db.hasOwnProperty(key);
-    }
-    public Save() {
-        fs.writeFileSync(abs_data_path, JSON.stringify(this.db));
+        console.log("Database closed");
     }
 }
 
-export default BotDatabase;
+let db = new BotDatabase();
+
+export default db;

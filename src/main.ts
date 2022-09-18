@@ -7,11 +7,18 @@ server.listen(3000);
 
 // create bot
 import Bot from "./Bot";
-let bot = new Bot();
-
-// start bot as NyachoDayo
 import { TOKEN } from "./data/config.json";
-bot.start(TOKEN);
+let bot = new Bot();
+bot.init().then(
+    () => {
+        // start bot as NyachoDayo
+        bot.start(TOKEN);
+    },
+    () => {
+        console.error("Bot initialization failed!");
+        process.exit(1);
+    }
+);
 
 // listen to & destruct on process terminating
 process.on("SIGTERM", () => {
