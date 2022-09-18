@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 
 import { EventHandler, BotCommand, SpecialReplies } from "./Typings";
+import BotDatabase from "./BotDatabase";
 
 // literally copied all possible intents
 const bot_intents = [
@@ -32,16 +33,18 @@ class Bot {
     replies: SpecialReplies[];
 
     constructor() {
-        console.log("Initializing bot");
-
         this.client = new Client({
             intents: bot_intents,
             presence: { status: "idle" },
         });
-
+    
         this.commands = new Map();
         this.replies = [];
+    }
 
+    async init() {
+        console.log("Initializing bot");
+        await BotDatabase.open();
         this.LoadEventListeners();
         this.LoadCommands();
         this.loadSpecialReplies();
@@ -69,6 +72,7 @@ class Bot {
             const command: BotCommand = require(path.join(commands_path, file));
             if(command.enabled) {
                 this.commands.set(command.command, command);
+                command.init(this);
                 console.log(`Added command: ${command.name}`);
             }
         }
@@ -132,13 +136,14 @@ class Bot {
     }
 
     // login & start the bot
-    start(token: string): void {
-        console.log("Bot starting");
-        this.client.login(token);
+    async start(token: string) {
+        await this.client.login(token);
+        console.log("Bot started");
     }
     // do bot destructing
-    quit(): void {
+    async quit() {
         this.client.destroy();
+        await BotDatabase.close();
         console.log("Bot terminated");
     }
 }

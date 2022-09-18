@@ -12,6 +12,7 @@ let cmd: BotCommand = {
             `Commands available: ${Array.from(bot.commands.keys()).join(", ")}`
         );
     },
+    init: async (bot: Bot): Promise<void> => {},
 };
 
 module.exports = cmd;

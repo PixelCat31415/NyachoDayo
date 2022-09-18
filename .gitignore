@@ -1,3 +1,4 @@
-src/config.json
-src/test.ts
+src/data
+src/test
 data.json
+node_modules/

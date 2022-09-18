@@ -11,6 +11,7 @@ let cmd: BotCommand = {
     exec: async (bot: Bot, cmd: Message, args: string[]): Promise<void> => {
         cmd.reply("pong!");
     },
+    init: async (bot: Bot): Promise<void> => {},
 };
 
 module.exports = cmd;

@@ -19,6 +19,8 @@ export type BotCommand = {
     enabled: boolean;
     // execute command
     exec(bot: Bot, cmd: Message, args: string[]): Promise<void>;
+    // init command
+    init(bot: Bot): Promise<void>;
 };
 
 export type SpecialReplies = {
