@@ -17,7 +17,7 @@ class BotDatabase {
     }
     public async open() {
         this.db = await open({
-            filename: ":memory:",
+            filename: abs_data_path,
             driver: sqlite3.Database,
         });
         console.log("Database opened");
